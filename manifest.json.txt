@@ -1,0 +1,8 @@
+{
+  "name": "感情一次処理",
+  "short_name": "感情整理",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f4f5f6",
+  "theme_color": "#f4f5f6"
+}

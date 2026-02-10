@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>感情一次処理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f4f5f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background:#f4f5f6;
+  padding:14px;
+  max-width:720px;
+  margin:auto;
+}
+h1 {
+  font-size:1.05rem;
+  margin-top:16px;
+}
+textarea {
+  width:100%;
+  min-height:140px;
+  padding:10px;
+  font-size:1rem;
+}
+button {
+  margin-top:12px;
+  padding:10px 14px;
+  font-size:1rem;
+}
+.levels button {
+  margin-right:6px;
+}
+.output {
+  background:#fff;
+  border:1px solid #ccc;
+  padding:12px;
+  margin-top:12px;
+  white-space:pre-wrap;
+}
+.hidden {
+  display:none;
+}
+</style>
+</head>
+
+<body>
+
+<h1>① 感情を吐き出す（保存されない）</h1>
+<textarea id="raw"></textarea>
+
+<h1>② 感情レベルを選ぶ</h1>
+<div class="levels">
+  <button onclick="setLevel(1)">軽い</button>
+  <button onclick="setLevel(2)">中</button>
+  <button onclick="setLevel(3)">重い</button>
+</div>
+<p id="levelText"></p>
+
+<button onclick="process()">③ 整形する（原文削除）</button>
+
+<h1>④ GPTに貼る文章</h1>
+<div class="output" id="result"></div>
+
+<button onclick="copyText()">コピー</button>
+
+<script>
+let level = 0;
+
+function setLevel(l){
+  level = l;
+  const map = {
+    1:"感情は軽度。整理すれば十分。",
+    2:"感情は中程度。冷静化が必要。",
+    3:"感情は重い。判断を急がない。"
+  };
+  document.getElementById("levelText").textContent = map[l];
+}
+
+function process(){
+  const raw = document.getElementById("raw").value.trim();
+  if(!raw || level === 0) return;
+
+  const prompt = `
+以下の文章を処理してください。
+
+【ルール】
+・意味、事実、感情の方向性は一切変えない
+・感情的な言葉を、落ち着いた日本語に整える
+・評価、助言、共感、分析は不要
+・整えた文章のみ出力する
+
+【感情レベル】
+${level}
+
+【文章】
+${raw}
+`.trim();
+
+  // 原文即削除
+  document.getElementById("raw").value = "";
+
+  document.getElementById("result").textContent = prompt;
+}
+
+function copyText(){
+  const text = document.getElementById("result").textContent;
+  navigator.clipboard.writeText(text);
+  alert("コピーしました");
+}
+
+// PWA
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+</body>
+</html>
